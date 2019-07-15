@@ -1,5 +1,7 @@
 # Some simple SQL extensions for Go
 
+[![GoDoc](https://godoc.org/github.com/travelaudience/go-sx?status.svg)](http://godoc.org/github.com/travelaudience/go-sx)
+
 **go-sx** provides some extensions to the standard library `database/sql` package.  It is designed for the programmer who wishes to use the full power of SQL without a heavy abstraction layer.
 
 ## Goals
