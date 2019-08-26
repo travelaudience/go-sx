@@ -1,16 +1,18 @@
-package sx
+package sx_test
 
 import (
 	"testing"
+
+	sx "github.com/travelaudience/go-sx"
 )
 
 func TestPlaceholders(t *testing.T) {
 
-	SetNumberedPlaceholders(false)
+	sx.SetNumberedPlaceholders(false)
 
 	t.Run("? placeholders", func(t *testing.T) {
 		want := []string{"?", "?", "?"}
-		var p Placeholder
+		var p sx.Placeholder
 
 		for i, x := range want {
 			y := p.Next()
@@ -20,11 +22,11 @@ func TestPlaceholders(t *testing.T) {
 		}
 	})
 
-	SetNumberedPlaceholders(true)
+	sx.SetNumberedPlaceholders(true)
 
 	t.Run("numbered placeholders", func(t *testing.T) {
 		want := []string{"$1", "$2", "$3"}
-		var p Placeholder
+		var p sx.Placeholder
 
 		for i, x := range want {
 			y := p.Next()
