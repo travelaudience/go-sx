@@ -1,8 +1,10 @@
-package sx
+package sx_test
 
 import (
 	"reflect"
 	"testing"
+
+	sx "github.com/travelaudience/go-sx"
 )
 
 // Test structs
@@ -68,14 +70,14 @@ func TestSelectInsertUpdateAll(t *testing.T) {
 	}
 
 	for _, c := range testCases {
-		SetNumberedPlaceholders(c.numberedPlaceholders)
-		if a, b := c.wantSelect, SelectQuery(c.table, c.datatype); a != b {
+		sx.SetNumberedPlaceholders(c.numberedPlaceholders)
+		if a, b := c.wantSelect, sx.SelectQuery(c.table, c.datatype); a != b {
 			t.Errorf("case %s select: expected \"%s\", got \"%s\"", c.name, a, b)
 		}
-		if a, b := c.wantInsert, InsertQuery(c.table, c.datatype); a != b {
+		if a, b := c.wantInsert, sx.InsertQuery(c.table, c.datatype); a != b {
 			t.Errorf("case %s insert: expected \"%s\", got \"%s\"", c.name, a, b)
 		}
-		if a, b := c.wantUpdate, UpdateAllQuery(c.table, c.datatype); a != b {
+		if a, b := c.wantUpdate, sx.UpdateAllQuery(c.table, c.datatype); a != b {
 			t.Errorf("case %s update all: expected \"%s\", got \"%s\"", c.name, a, b)
 		}
 	}
@@ -107,7 +109,7 @@ func TestSelectAlias(t *testing.T) {
 	}
 
 	for _, c := range testCases {
-		if a, b := c.wantSelect, SelectAliasQuery(c.table, c.alias, c.datatype); a != b {
+		if a, b := c.wantSelect, sx.SelectAliasQuery(c.table, c.alias, c.datatype); a != b {
 			t.Errorf("case %s select alias: expected \"%s\", got \"%s\"", c.name, a, b)
 		}
 	}
@@ -141,7 +143,7 @@ func TestWhere(t *testing.T) {
 	}
 
 	for _, c := range testCases {
-		if a, b := c.want, Where(c.conditions...); a != b {
+		if a, b := c.want, sx.Where(c.conditions...); a != b {
 			t.Errorf("case %s: expected \"%s\", got \"%s\"", c.name, a, b)
 		}
 	}
@@ -183,7 +185,7 @@ func TestLimitOffset(t *testing.T) {
 	}
 
 	for _, c := range testCases {
-		if a, b := c.want, LimitOffset(c.limit, c.offset); a != b {
+		if a, b := c.want, sx.LimitOffset(c.limit, c.offset); a != b {
 			t.Errorf("case %s: expected \"%s\", got \"%s\"", c.name, a, b)
 		}
 	}
@@ -212,7 +214,7 @@ func TestInsertPanic(t *testing.T) {
 			}
 			panic(r)
 		}()
-		InsertQuery("zoo", &ohNo{})
+		sx.InsertQuery("zoo", &ohNo{})
 	}()
 }
 
@@ -308,8 +310,8 @@ func TestUpdate(t *testing.T) {
 	}
 
 	for _, c := range testCases {
-		SetNumberedPlaceholders(c.numberedPlaceholders)
-		query, values := UpdateQuery(c.table, c.data)
+		sx.SetNumberedPlaceholders(c.numberedPlaceholders)
+		query, values := sx.UpdateQuery(c.table, c.data)
 		if a, b := c.wantQuery, query; a != b {
 			t.Errorf("case %s query: expected \"%s\", got \"%s\"", c.name, a, b)
 		}
@@ -421,7 +423,7 @@ func TestUpdateFields(t *testing.T) {
 			gotPanic string
 		)
 
-		SetNumberedPlaceholders(c.numberedPlaceholders)
+		sx.SetNumberedPlaceholders(c.numberedPlaceholders)
 
 		func() {
 			gotPanic = ""
@@ -436,7 +438,7 @@ func TestUpdateFields(t *testing.T) {
 				}
 				panic(r)
 			}()
-			query, values = UpdateFieldsQuery(c.table, c.data, c.fields...)
+			query, values = sx.UpdateFieldsQuery(c.table, c.data, c.fields...)
 		}()
 
 		if gotPanic != c.wantPanic {
@@ -502,10 +504,10 @@ func TestAddrsValues(t *testing.T) {
 	}
 
 	for _, c := range testCases {
-		if a, b := c.wantAddrs, Addrs(c.data); !shallowEqual(a, b) {
+		if a, b := c.wantAddrs, sx.Addrs(c.data); !shallowEqual(a, b) {
 			t.Errorf("case %s addrs: expected %v, got %v", c.name, a, b)
 		}
-		if a, b := c.wantValues, Values(c.data); !reflect.DeepEqual(a, b) {
+		if a, b := c.wantValues, sx.Values(c.data); !reflect.DeepEqual(a, b) {
 			t.Errorf("case %s values: expected %v, got %v", c.name, a, b)
 		}
 	}
@@ -546,7 +548,7 @@ func TestValueOf(t *testing.T) {
 	}
 
 	for _, c := range testCases {
-		if a, b := c.wantValue, ValueOf(c.data, c.field); a != b {
+		if a, b := c.wantValue, sx.ValueOf(c.data, c.field); a != b {
 			t.Errorf("case %s: expected %v, got %v", c.name, a, b)
 		}
 	}
@@ -575,10 +577,10 @@ func TestColumnsColumnsWriteable(t *testing.T) {
 	}
 
 	for _, c := range testCases {
-		if a, b := c.wantColumns, Columns(c.datatype); !reflect.DeepEqual(a, b) {
+		if a, b := c.wantColumns, sx.Columns(c.datatype); !reflect.DeepEqual(a, b) {
 			t.Errorf("case %s columns: expected %v, got %v", c.name, a, b)
 		}
-		if a, b := c.wantColumnsWriteable, ColumnsWriteable(c.datatype); !reflect.DeepEqual(a, b) {
+		if a, b := c.wantColumnsWriteable, sx.ColumnsWriteable(c.datatype); !reflect.DeepEqual(a, b) {
 			t.Errorf("case %s columns writeable: expected %v, got %v", c.name, a, b)
 		}
 	}
@@ -632,7 +634,7 @@ func TestColumnOf(t *testing.T) {
 	}
 
 	for _, c := range testCases {
-		column, err := ColumnOf(c.datatype, c.field)
+		column, err := sx.ColumnOf(c.datatype, c.field)
 		if err != nil {
 			if c.wantErr == "" {
 				t.Errorf("case %s: unexpected error %q", c.name, err.Error())

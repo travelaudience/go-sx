@@ -1,4 +1,4 @@
-package sx
+package sx_test
 
 import (
 	"context"
@@ -13,6 +13,8 @@ import (
 	"time"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
+
+	sx "github.com/travelaudience/go-sx"
 )
 
 var randseed int64
@@ -65,7 +67,7 @@ func TestMustExec(t *testing.T) {
 		mock.ExpectExec(query).WillReturnResult(sqlmock.NewResult(a, b))
 		mock.ExpectCommit()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			res := tx.MustExec(query)
 			a0, _ := res.LastInsertId()
 			b0, _ := res.RowsAffected()
@@ -89,7 +91,7 @@ func TestMustExec(t *testing.T) {
 		mock.ExpectExec(query).WillReturnError(err0)
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			tx.MustExec(query)
 		})
 		if err != err0 {
@@ -108,7 +110,7 @@ func TestMustExec(t *testing.T) {
 		mock.ExpectExec(query).WithArgs(x).WillReturnResult(sqlmock.NewResult(a, b))
 		mock.ExpectCommit()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			res := tx.MustExec(query, x)
 			a0, _ := res.LastInsertId()
 			b0, _ := res.RowsAffected()
@@ -133,7 +135,7 @@ func TestMustExec(t *testing.T) {
 		mock.ExpectExec(query).WithArgs(x, y).WillReturnError(err0)
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			tx.MustExec(query, x, y)
 		})
 		if err != err0 {
@@ -152,7 +154,7 @@ func TestMustExec(t *testing.T) {
 		mock.ExpectExec(query).WillReturnResult(sqlmock.NewResult(a, b))
 		mock.ExpectCommit()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			res := tx.MustExecContext(context.Background(), query)
 			a0, _ := res.LastInsertId()
 			b0, _ := res.RowsAffected()
@@ -176,7 +178,7 @@ func TestMustExec(t *testing.T) {
 		mock.ExpectExec(query).WillReturnError(err0)
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			tx.MustExec(query)
 		}, sql.TxOptions{Isolation: sql.LevelSerializable})
 		if err != err0 {
@@ -199,7 +201,7 @@ func TestMustQueryRow(t *testing.T) {
 		mock.ExpectQuery(query).WillReturnRows(rows)
 		mock.ExpectCommit()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			var a0, b0 int64
 			tx.MustQueryRow(query).MustScan(&a0, &b0)
 			if a0 != a || b0 != b {
@@ -222,7 +224,7 @@ func TestMustQueryRow(t *testing.T) {
 		mock.ExpectQuery(query).WillReturnRows(rows)
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			var a0, b0 int64
 			tx.MustQueryRow(query).MustScan(&a0, &b0)
 		})
@@ -242,7 +244,7 @@ func TestMustQueryRow(t *testing.T) {
 		mock.ExpectQuery(query).WillReturnError(err0)
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			var a0, b0 int64
 			tx.MustQueryRow(query).MustScan(&a0, &b0)
 		})
@@ -263,7 +265,7 @@ func TestMustQueryRow(t *testing.T) {
 		mock.ExpectQuery(query).WithArgs(x).WillReturnError(err0)
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			var a0, b0 int64
 			tx.MustQueryRow(query, x).MustScan(&a0, &b0)
 		})
@@ -284,7 +286,7 @@ func TestMustQueryRow(t *testing.T) {
 		mock.ExpectQuery(query).WithArgs(x, y, z).WillReturnRows(rows)
 		mock.ExpectCommit()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			var res struct{ A, B int64 }
 			tx.MustQueryRow(query, x, y, z).MustScans(&res)
 			if res.A != a || res.B != b {
@@ -308,7 +310,7 @@ func TestMustQueryRow(t *testing.T) {
 		mock.ExpectQuery(query).WillReturnRows(rows)
 		mock.ExpectCommit()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			var a0, b0 int64
 			tx.MustQueryRowContext(context.TODO(), query).MustScan(&a0, &b0)
 			if a0 != a || b0 != b {
@@ -334,7 +336,7 @@ func TestMustQuery(t *testing.T) {
 		mock.ExpectQuery(query).WillReturnError(err0)
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			tx.MustQuery(query)
 		})
 		if err != err0 {
@@ -354,7 +356,7 @@ func TestMustQuery(t *testing.T) {
 		mock.ExpectQuery(query).WithArgs(x).WillReturnError(err0)
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			tx.MustQuery(query, x)
 		})
 		if err != err0 {
@@ -376,8 +378,8 @@ func TestMustQuery(t *testing.T) {
 
 		var a0, b0 int64
 		n := 0
-		err := Do(db, func(tx *Tx) {
-			tx.MustQuery(query, x).Each(func(r *Rows) {
+		err := sx.Do(db, func(tx *sx.Tx) {
+			tx.MustQuery(query, x).Each(func(r *sx.Rows) {
 				r.MustScan(&a0, &b0)
 				n++
 			})
@@ -406,8 +408,8 @@ func TestMustQuery(t *testing.T) {
 
 		var a0, b0 int64
 		n := 0
-		err := Do(db, func(tx *Tx) {
-			tx.MustQuery(query, x).Each(func(r *Rows) {
+		err := sx.Do(db, func(tx *sx.Tx) {
+			tx.MustQuery(query, x).Each(func(r *sx.Rows) {
 				r.MustScan(&a0, &b0)
 				n++
 			})
@@ -435,8 +437,8 @@ func TestMustQuery(t *testing.T) {
 
 		var res [2]ab
 		n := 0
-		err := Do(db, func(tx *Tx) {
-			tx.MustQuery(query, x).Each(func(r *Rows) {
+		err := sx.Do(db, func(tx *sx.Tx) {
+			tx.MustQuery(query, x).Each(func(r *sx.Rows) {
 				r.MustScans(&res[n])
 				n++
 			})
@@ -467,8 +469,8 @@ func TestMustQuery(t *testing.T) {
 
 		var aa, bb [2]int64
 		n := 0
-		err := Do(db, func(tx *Tx) {
-			tx.MustQuery(query, x, y).Each(func(r *Rows) {
+		err := sx.Do(db, func(tx *sx.Tx) {
+			tx.MustQuery(query, x, y).Each(func(r *sx.Rows) {
 				r.MustScan(&aa[n], &bb[n])
 				n++
 			})
@@ -498,8 +500,8 @@ func TestMustQuery(t *testing.T) {
 
 		var aa, bb [3]int64
 		n := 0
-		err := Do(db, func(tx *Tx) {
-			tx.MustQuery(query, x, y).Each(func(r *Rows) {
+		err := sx.Do(db, func(tx *sx.Tx) {
+			tx.MustQuery(query, x, y).Each(func(r *sx.Rows) {
 				r.MustScan(&aa[n], &bb[n])
 				n++
 			})
@@ -525,7 +527,7 @@ func TestMustQuery(t *testing.T) {
 		mock.ExpectQuery(query).WillReturnError(err0)
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			tx.MustQueryContext(context.TODO(), query)
 		})
 		if err != err0 {
@@ -547,8 +549,8 @@ func TestMustPrepare(t *testing.T) {
 		mock.ExpectPrepare(query).ExpectExec().WithArgs(x).WillReturnResult(sqlmock.NewResult(a, b))
 		mock.ExpectCommit()
 
-		err := Do(db, func(tx *Tx) {
-			tx.MustPrepare(query).Do(func(stmt *Stmt) {
+		err := sx.Do(db, func(tx *sx.Tx) {
+			tx.MustPrepare(query).Do(func(stmt *sx.Stmt) {
 				res := stmt.MustExec(x)
 				a0, _ := res.LastInsertId()
 				b0, _ := res.RowsAffected()
@@ -573,8 +575,8 @@ func TestMustPrepare(t *testing.T) {
 		mock.ExpectPrepare(query).ExpectExec().WillReturnError(err0)
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
-			tx.MustPrepare(query).Do(func(stmt *Stmt) {
+		err := sx.Do(db, func(tx *sx.Tx) {
+			tx.MustPrepare(query).Do(func(stmt *sx.Stmt) {
 				stmt.MustExec()
 			})
 		})
@@ -595,9 +597,9 @@ func TestMustPrepare(t *testing.T) {
 		mock.ExpectPrepare(query).ExpectQuery().WithArgs(x).WillReturnRows(rows)
 		mock.ExpectCommit()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			var a0, b0 int64
-			tx.MustPrepare(query).Do(func(stmt *Stmt) {
+			tx.MustPrepare(query).Do(func(stmt *sx.Stmt) {
 				stmt.MustQueryRow(x).MustScan(&a0, &b0)
 				if a0 != a || b0 != b {
 					t.Errorf("Expected result (%d, %d), got (%d, %d)", a, b, a0, b0)
@@ -620,9 +622,9 @@ func TestMustPrepare(t *testing.T) {
 		mock.ExpectPrepare(query).ExpectQuery().WillReturnError(err0)
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			var a0, b0 int64
-			tx.MustPrepare(query).Do(func(stmt *Stmt) {
+			tx.MustPrepare(query).Do(func(stmt *sx.Stmt) {
 				stmt.MustQueryRow().MustScan(&a0, &b0)
 			})
 		})
@@ -645,9 +647,9 @@ func TestMustPrepare(t *testing.T) {
 
 		var a0, b0 int64
 		n := 0
-		err := Do(db, func(tx *Tx) {
-			tx.MustPrepare(query).Do(func(stmt *Stmt) {
-				stmt.MustQuery(x).Each(func(r *Rows) {
+		err := sx.Do(db, func(tx *sx.Tx) {
+			tx.MustPrepare(query).Do(func(stmt *sx.Stmt) {
+				stmt.MustQuery(x).Each(func(r *sx.Rows) {
 					r.MustScan(&a0, &b0)
 					n++
 				})
@@ -674,8 +676,8 @@ func TestMustPrepare(t *testing.T) {
 		mock.ExpectPrepare(query).ExpectQuery().WillReturnError(err0)
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
-			tx.MustPrepare(query).Do(func(stmt *Stmt) {
+		err := sx.Do(db, func(tx *sx.Tx) {
+			tx.MustPrepare(query).Do(func(stmt *sx.Stmt) {
 				stmt.MustQuery()
 			})
 		})
@@ -695,7 +697,7 @@ func TestMustPrepare(t *testing.T) {
 		mock.ExpectPrepare(query).WillReturnError(err0)
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			tx.MustPrepare(query)
 		})
 		if err != err0 {
@@ -715,9 +717,9 @@ func TestMustPrepare(t *testing.T) {
 		mock.ExpectPrepare(query).ExpectQuery().WithArgs(x).WillReturnRows(rows)
 		mock.ExpectCommit()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			var a0, b0 int64
-			tx.MustPrepareContext(context.TODO(), query).Do(func(stmt *Stmt) {
+			tx.MustPrepareContext(context.TODO(), query).Do(func(stmt *sx.Stmt) {
 				stmt.MustQueryRowContext(context.TODO(), x).MustScan(&a0, &b0)
 				if a0 != a || b0 != b {
 					t.Errorf("Expected result (%d, %d), got (%d, %d)", a, b, a0, b0)
@@ -740,8 +742,8 @@ func TestMustPrepare(t *testing.T) {
 		mock.ExpectPrepare(query).ExpectQuery().WillReturnError(err0)
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
-			tx.MustPrepareContext(context.TODO(), query).Do(func(stmt *Stmt) {
+		err := sx.Do(db, func(tx *sx.Tx) {
+			tx.MustPrepareContext(context.TODO(), query).Do(func(stmt *sx.Stmt) {
 				stmt.MustQueryContext(context.TODO())
 			})
 		})
@@ -762,7 +764,7 @@ func TestFail(t *testing.T) {
 		mock.ExpectBegin()
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			tx.Fail(err0)
 		})
 		if err != err0 {
@@ -778,7 +780,7 @@ func TestFail(t *testing.T) {
 
 		mock.ExpectBegin().WillReturnError(err0)
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			tx.Fail(errors.New("should never happen"))
 		})
 
@@ -806,7 +808,7 @@ func TestFail(t *testing.T) {
 					}
 				}
 			}()
-			Do(db, func(tx *Tx) {
+			sx.Do(db, func(tx *sx.Tx) {
 				panic(err0)
 			})
 		}()
@@ -823,7 +825,7 @@ func TestFail(t *testing.T) {
 		mock.ExpectBegin()
 		mock.ExpectRollback()
 
-		err := Do(db, func(tx *Tx) {
+		err := sx.Do(db, func(tx *sx.Tx) {
 			// This should roll back the transaction and return a nil error
 			tx.Fail(nil)
 		})
