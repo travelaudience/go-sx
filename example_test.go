@@ -1,10 +1,71 @@
 package sx_test
 
 import (
+	"database/sql"
 	"fmt"
 
+	_ "github.com/mattn/go-sqlite3"
 	sx "github.com/travelaudience/go-sx"
 )
+
+func Example() {
+	db, err := sql.Open("sqlite3", ":memory:")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	_, err = db.Exec("CREATE TABLE numbers (foo integer, bar string)")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	// This is the default, but other examples set numbered placeholders to true, so we need to make sure here that it's false.
+	// In practice, this would only be set during initialization, and then only when $n-style placeholders are needed.
+	sx.SetNumberedPlaceholders(false)
+
+	type abc struct {
+		Foo int32
+		Bar string
+	}
+	var data = []abc{
+		{Foo: 1, Bar: "one"},
+		{Foo: 2, Bar: "two"},
+		{Foo: 3, Bar: "three"},
+	}
+
+	// Use Do to run a transaction.
+	if err = sx.Do(db, func(tx *sx.Tx) {
+		// Use MustPrepare with Do to insert rows into the table.
+		query := sx.InsertQuery("numbers", &abc{})
+		tx.MustPrepare(query).Do(func(s *sx.Stmt) {
+			for _, x := range data {
+				s.MustExec(sx.Values(&x)...)
+			}
+		})
+	}); err != nil {
+		// Any database-level error will be caught and printed here.
+		fmt.Println(err)
+		return
+	}
+
+	var dataRead []abc
+	if err = sx.Do(db, func(tx *sx.Tx) {
+		// Use MustQuery with Each to read the rows back in alphabetical order.
+		query := sx.SelectQuery("numbers", &abc{}) + " ORDER BY bar"
+		tx.MustQuery(query).Each(func(r *sx.Rows) {
+			var x abc
+			r.MustScans(&x)
+			dataRead = append(dataRead, x)
+		})
+	}); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(dataRead)
+	// Output:
+	// [{1 one} {3 three} {2 two}]
+}
 
 func ExampleSelectQuery() {
 	type abc struct {
