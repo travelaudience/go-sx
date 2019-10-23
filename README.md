@@ -3,7 +3,7 @@
 [![GoDoc](https://godoc.org/github.com/travelaudience/go-sx?status.svg)](http://godoc.org/github.com/travelaudience/go-sx)
 [![CircleCI](https://circleci.com/gh/travelaudience/go-sx.svg?style=svg)](https://circleci.com/gh/travelaudience/go-sx)
 
-**go-sx** provides some extensions to the standard library `database/sql` package.  It is designed for the programmer who wishes to use the full power of SQL without a heavy abstraction layer.
+**go-sx** provides some extensions to the standard library `database/sql` package.  It is designed for those who wish to use the full power of SQL without a heavy abstraction layer.
 
 ## Goals
 
@@ -72,7 +72,7 @@ Under the hood, `tx.Fail()` generates a panic which is recovered by `Do`.
 
 **go-sx** provides a collection of `Must***` methods which may be used inside of the callback to `Do`.  Any error encountered while in a `Must***` method causes the transaction to be aborted and rolled back.
 
-Here is the code above, rewritten to use `Do`'s error handling.
+Here is the code above, rewritten to use `Do`'s error handling.  It's simple and readable.
 
 ```go
 err := sx.Do(db, func (tx *sx.Tx) {
@@ -101,7 +101,7 @@ Or better yet, let **go-sx** handle the errors:
 row.MustScan(sx.Addrs(&a)...)
 ```
 
-This is such a common pattern that we provide a shortcut to do this in one step:
+This is such a common pattern that we provide a shortcut to do this all in one step:
 
 ```go
 row.MustScans(&a)
@@ -130,11 +130,11 @@ We can use the helper function `SelectQuery` to construct a simple query.  Then 
 var spo orchestra
 
 wantID := 123
-query := sx.UpdateQuery("symphony", &spo) + " WHERE id=?"  // SELECT violin,viola,cello,contrabass FROM symphony WHERE id=?
+query := sx.SelectQuery("symphony", &spo) + " WHERE id=?"  // SELECT violin,viola,cello,contrabass FROM symphony WHERE id=?
 tx.MustQueryRow(query, wantID).MustScans(&spo)
 ```
 
-Note that a struct need not follow the database schema exactly.  It's entirely possible to have various structs mapped to different columns of the same table, or even one struct that maps to a query on joined tables.
+Note that a struct need not follow the database schema exactly.  It's entirely possible to have various structs mapped to different columns of the same table, or even one struct that maps to a query on joined tables.  On the other hand, it's essential that the columns in the query match the fields of the struct, and **go-sx** guarantees this, as we'll see below.
 
 In some cases it's useful to have a struct that is used for both selects and inserts, with some of the fields being used just for selects.  This can be accomplished with the "readonly" tag.
 
@@ -147,7 +147,7 @@ type orchestra1 struct {
 }
 ```
 
-In some cases it's useful to have a struct field that is ignored by **go-sx**.  This can be accomplished with the "-" tag.
+It's also useful in some cases to have a struct field that is ignored by **go-sx**.  This can be accomplished with the "-" tag.
 
 ```go
 type orchestra2 struct {
@@ -158,7 +158,7 @@ type orchestra2 struct {
 }
 ```
 
-We can construct insert queries in a similar manner.  Violin is read-only and Viola is ignored, so we only need to provide values for Cello and Bass.
+We can construct insert queries in a similar manner.  Violin is read-only and Viola is ignored, so we only need to provide values for Cello and Bass.  (If you need Postgres-style `$n` placeholders, see `sx.SetNumberedPlaceholders()`.)
 
 ```go
 spo := orchestra2{Cello: "Strad", Bass: "Cecilio"}
@@ -167,7 +167,7 @@ query := sx.InsertQuery("symphony", &spo)  // INSERT INTO symphony (cello,contra
 tx.MustExec(query, sx.Values(&spo)...)
 ```
 
-We can contruct update queries this way too, and there is also an option to skip fields whose values are the zero values.
+We can contruct update queries this way too, and there is also an option to skip fields whose values are the zero values.  (The update structs support pointer fields, making this skip option rather useful.)
 
 ```go
 spoChanges := orchestra2{Bass: "Strad"}
@@ -177,6 +177,8 @@ query, values := sx.UpdateQuery("symphony", &spoChanges) + " WHERE id=?"  // UPD
 tx.MustExec(query, append(values, wantID)...)
 ```
 
+It is entirely possible to construct all of these queries by hand, and you're all welcome to do so.  Using the query generators, however, ensures that the fields match correctly, something that is particularly useful with a large number of columns.
+
 ## Point point #5:  Iterating over result sets is clumsy.
 
 **go-sx** provides an iterator called `Each` which runs a callback function on each row of a result set.  Using the iterator simplifies this code:
@@ -184,7 +186,7 @@ tx.MustExec(query, append(values, wantID)...)
 ```go
 var orchestras []orchestra
 
-query := sx.SelectQuery("symphony", &orchestra{}) + " WHERE length(violin)>length(cello)"
+query := "SELECT violin,viola,cello,contrabass FROM symphony ORDER BY viola"  // Or we could use sx.SelectQuery()
 rows := tx.MustQuery(query)
 defer rows.Close()
 for rows.Next() {
@@ -202,7 +204,7 @@ To this:
 ```go
 var orchestras []orchestra
 
-query := sx.SelectQuery("symphony", &orchestra{}) + " WHERE length(violin)>length(cello)"
+query := "SELECT violin,viola,cello,contrabass FROM symphony ORDER BY viola"
 tx.MustQuery(query).Each(func (r *sx.Rows) {
     var o orchestra
     r.MustScans(&o)

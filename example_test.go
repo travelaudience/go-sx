@@ -19,8 +19,9 @@ func Example() {
 		fmt.Println(err)
 		return
 	}
-	// This is the default, but other examples set numbered placeholders to true, so we need to make sure here that it's false.
-	// In practice, this would only be set during initialization, and then only when $n-style placeholders are needed.
+	// This is the default, but other examples set numbered placeholders to true, so
+	// we need to make sure here that it's false.  In practice, this would only be set
+	// during initialization, and then only when $n-style placeholders are needed.
 	sx.SetNumberedPlaceholders(false)
 
 	type abc struct {
