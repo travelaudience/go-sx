@@ -179,7 +179,7 @@ tx.MustExec(query, append(values, wantID)...)
 
 It is entirely possible to construct all of these queries by hand, and you're all welcome to do so.  Using the query generators, however, ensures that the fields match correctly, something that is particularly useful with a large number of columns.
 
-## Point point #5:  Iterating over result sets is clumsy.
+## Pain point #5:  Iterating over result sets is clumsy.
 
 **go-sx** provides an iterator called `Each` which runs a callback function on each row of a result set.  Using the iterator simplifies this code:
 
@@ -214,7 +214,7 @@ tx.MustQuery(query).Each(func (r *sx.Rows) {
 
 ## Contributing
 
-Contributions are welcomed! Read the [Contributing Guide](CONTRIBUTING.md) for more information.
+Contributions are welcome! Read the [Contributing Guide](CONTRIBUTING.md) for more information.
 
 ## Licensing
 
