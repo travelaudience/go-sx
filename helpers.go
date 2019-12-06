@@ -143,7 +143,7 @@ func UpdateQuery(table string, data interface{}) (string, []interface{}) {
 
 	for _, c := range m.columns {
 		if !c.readonly {
-			if val := instance.Field(c.index); !valueIsZero(val) {
+			if val := instance.Field(c.index); !val.IsZero() {
 				columns = append(columns, c.name+"="+p.Next())
 				if val.Kind() == reflect.Ptr {
 					val = val.Elem()
