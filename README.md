@@ -5,6 +5,8 @@
 
 **go-sx** provides some extensions to the standard library `database/sql` package.  It is designed for those who wish to use the full power of SQL without a heavy abstraction layer.
 
+**UPDATE (July 2020):** This library is still actively maintained.  Contributions are welcome.
+
 ## Goals
 
 The primary goal of **go-sx** is to eliminate boilerplate code.  Specifically, **go-sx** attempts to address the following pain points:
