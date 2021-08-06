@@ -1,11 +1,13 @@
 # Some simple SQL extensions for Go
 
-[![GoDoc](https://godoc.org/github.com/travelaudience/go-sx?status.svg)](http://godoc.org/github.com/travelaudience/go-sx)
+[![Go Reference](https://pkg.go.dev/badge/github.com/travelaudience/go-sx.svg)](https://pkg.go.dev/github.com/travelaudience/go-sx)
 [![CircleCI](https://circleci.com/gh/travelaudience/go-sx.svg?style=svg)](https://circleci.com/gh/travelaudience/go-sx)
 
 **go-sx** provides some extensions to the standard library `database/sql` package.  It is designed for those who wish to use the full power of SQL without a heavy abstraction layer.
 
 **UPDATE (July 2020):** This library is still actively maintained.  Contributions are welcome.
+
+**UPDATE (August 2021):** Please don't be fooled by the lack of activity.  This library is still actively used and maintained.  Contributions are welcome.
 
 ## Goals
 
