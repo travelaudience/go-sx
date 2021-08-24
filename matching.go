@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"sync"
 )
 
 // A matching is between struct fields and database columns.
@@ -52,6 +53,9 @@ func (m *matching) columnOf(field string) *column {
 //
 // Panics if datatype does not point at a struct, or if the struct has no usable fields.
 func matchingOf(datatype interface{}) *matching {
+	matchingCacheMu.Lock()
+	defer matchingCacheMu.Unlock()
+
 	v := reflect.ValueOf(datatype)
 	if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
 		panic("sx: expected a pointer to a struct")
@@ -107,6 +111,7 @@ func matchingOf(datatype interface{}) *matching {
 
 // Cache to keep track of struct types that have been seen and therefore analyzed.
 var matchingCache = make(map[reflect.Type]*matching)
+var matchingCacheMu sync.Mutex
 
 // Snake-casing logic.
 
