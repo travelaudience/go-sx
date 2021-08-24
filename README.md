@@ -5,9 +5,7 @@
 
 **go-sx** provides some extensions to the standard library `database/sql` package.  It is designed for those who wish to use the full power of SQL without a heavy abstraction layer.
 
-**UPDATE (July 2020):** This library is still actively maintained.  Contributions are welcome.
-
-**UPDATE (August 2021):** Please don't be fooled by the lack of activity.  This library is still actively used and maintained.  Contributions are welcome.
+This library is actively maintained.  Contributions are welcome.
 
 ## Goals
 
