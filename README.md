@@ -7,6 +7,38 @@
 
 This library is actively maintained.  Contributions are welcome.
 
+## Quickstart
+
+This is what application code typically looks like.  The example here is for fetching multiple database rows into a
+slice of structs.  Note that the order of exported struct fields needs to match the columns in the SQL result set.
+
+```go
+type exam struct {
+    ID    int64
+    Name  string
+    Score float64
+}
+
+db, err := sql.Open(...)
+if err != nil {
+    ...
+}
+
+var scores []exam
+err = sx.Do(db, func(tx *sx.Tx) {
+    tx.MustQuery("SELECT id, name, score FROM exam_scores ORDER BY name").Each(func(r *sx.Rows) {
+        var e exam
+        r.MustScans(&e)
+        scores = append(scores, e)
+    })
+})
+if err != nil {
+    ...
+}
+```
+
+For more in-depth details, please keep reading!
+
 ## Goals
 
 The primary goal of **go-sx** is to eliminate boilerplate code.  Specifically, **go-sx** attempts to address the following pain points:
