@@ -8,7 +8,9 @@ import (
 )
 
 // SelectQuery returns a query string of the form
-//     SELECT <columns> FROM <table>
+//
+//	SELECT <columns> FROM <table>
+//
 // where <columns> is the list of columns defined by the struct pointed at by datatype, and <table> is the table name
 // given.
 func SelectQuery(table string, datatype interface{}) string {
@@ -26,7 +28,8 @@ func SelectQuery(table string, datatype interface{}) string {
 }
 
 // SelectAliasQuery returns a query string like that of SelectQuery except that a table alias is included, e.g.
-//     SELECT <alias>.<col0>, <alias>.<col1>, ..., <alias>.<coln> FROM <table> <alias>
+//
+//	SELECT <alias>.<col0>, <alias>.<col1>, ..., <alias>.<coln> FROM <table> <alias>
 func SelectAliasQuery(table, alias string, datatype interface{}) string {
 	bob := strings.Builder{}
 	bob.WriteString("SELECT")
@@ -46,7 +49,9 @@ func SelectAliasQuery(table, alias string, datatype interface{}) string {
 }
 
 // Where returns a string of the form
-//     WHERE (<condition>) AND (<condition>) ...
+//
+//	WHERE (<condition>) AND (<condition>) ...
+//
 // with a leading space.
 //
 // If no conditions are given, then Where returns the empty string.
@@ -58,7 +63,9 @@ func Where(conditions ...string) string {
 }
 
 // LimitOffset returns a string of the form
-//     LIMIT <limit> OFFSET <offset>
+//
+//	LIMIT <limit> OFFSET <offset>
+//
 // with a leading space.
 //
 // If either limit or offset are zero, then that part of the string is omitted.  If both limit and offset are zero,
@@ -75,8 +82,10 @@ func LimitOffset(limit, offset int64) string {
 }
 
 // InsertQuery returns a query string of the form
-//     INSERT INTO <table> (<columns>) VALUES (?,?,...)
-//     INSERT INTO <table> (<columns>) VALUES ($1,$2,...)  (numbered placeholders)
+//
+//	INSERT INTO <table> (<columns>) VALUES (?,?,...)
+//	INSERT INTO <table> (<columns>) VALUES ($1,$2,...)  (numbered placeholders)
+//
 // where <table> is the table name given, and <columns> is the list of the columns defined by the struct pointed at by
 // datatype.  Struct fields tagged "readonly" are skipped.
 //
@@ -115,11 +124,15 @@ func InsertQuery(table string, datatype interface{}) string {
 // way to do updates, as it allows pointer fields in the struct and automatically skips zero values.
 //
 // The query string of the form
-//     UPDATE <table> SET <column>=?,<column>=?,...
-//     UPDATE <table> SET <column>=$2,<column>=$3,...  (numbered placeholders)
+//
+//	UPDATE <table> SET <column>=?,<column>=?,...
+//	UPDATE <table> SET <column>=$2,<column>=$3,...  (numbered placeholders)
+//
 // where <table> is the table name given, and each <column> is a column name defined by the struct pointed at by data.
 //
-// With numbered placeholders, numbering starts at $2.  This allows $1 to be used in the WHERE clause.
+// Note:
+//   - placeholder could be passed as an optional parameter ( to control numbered placeholders )
+//   - if not, numbering starts at $2 to allow $1 to be used in the WHERE clause ( ie. WHERE id = $1 ).
 //
 // The list of values contains values from the struct to match the placeholders.  For pointer fields, the values
 // pointed at are used.
@@ -133,13 +146,22 @@ func InsertQuery(table string, datatype interface{}) string {
 // same table.  This is okay.
 //
 // If there are no applicable fields, Update returns ("", nil).
-func UpdateQuery(table string, data interface{}) (string, []interface{}) {
+func UpdateQuery(table string, data interface{}, ph ...*Placeholder) (string, []interface{}) {
 	m := matchingOf(data)
 	instance := reflect.ValueOf(data).Elem()
 
 	columns := make([]string, 0)
 	values := make([]interface{}, 0)
-	var p Placeholder = 1 // start from 2
+
+	// check for optional placeholder provided in the parameters
+	var p *Placeholder
+	if len(ph) > 0 {
+		p = ph[0]
+	} else {
+		// if not, use default one that starts from 2
+		var defaultPh Placeholder = 1
+		p = &defaultPh
+	}
 
 	for _, c := range m.columns {
 		if !c.readonly {
@@ -160,8 +182,10 @@ func UpdateQuery(table string, data interface{}) (string, []interface{}) {
 }
 
 // UpdateAllQuery returns a query string of the form
-//     UPDATE <table> SET <column>=?,<column>=?,...
-//     UPDATE <table> SET <column>=$2,<column>=$3,...  (numbered placeholders)
+//
+//	UPDATE <table> SET <column>=?,<column>=?,...
+//	UPDATE <table> SET <column>=$2,<column>=$3,...  (numbered placeholders)
+//
 // where <table> is the table name given, and each <column> is a column name defined by the struct pointed at by
 // data.  All writeable fields (those not tagged "readonly") are included.  Fields are in the order of the struct.
 //
@@ -185,8 +209,10 @@ func UpdateAllQuery(table string, data interface{}) string {
 // UpdateFieldsQuery returns a query string and a list of values for the specified fields of the struct pointed at by data.
 //
 // The query string is of the form
-//     UPDATE <table> SET <column>=?,<column>=?,...
-//     UPDATE <table> SET <column>=$2,<column>=$3,...  (numbered placeholders)
+//
+//	UPDATE <table> SET <column>=?,<column>=?,...
+//	UPDATE <table> SET <column>=$2,<column>=$3,...  (numbered placeholders)
+//
 // where <table> is the table name given, and each <column> is a column name defined by the struct pointed at by data.
 //
 // The list of values contains values from the struct to match the placeholders.  The order matches the the order of
