@@ -2,7 +2,6 @@ version: 2.1
 
 orbs:
   ta-go: travelaudience/go@0.8.0
-  ta-deploy: travelaudience/deploy@0.3
 
 executors:
   golang-executor:
@@ -25,15 +24,3 @@ workflows:
     - ta-go/test_and_coverage:
         name: test
         exec: golang-executor
-
-  tag_deploy:
-    jobs:
-    - ta-docker/docker_git_tag:
-        context: docker-registry-access
-        name: go-sx
-        image-name: go-sx
-        filters:
-          tags:
-            only: /.*/
-          branches:
-            ignore: /.*/
