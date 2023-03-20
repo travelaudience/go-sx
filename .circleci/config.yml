@@ -26,9 +26,14 @@ workflows:
         name: test
         exec: golang-executor
 
-    - ta-go/build:
-        name: build
-        requires:
-        - check
-        - test
-        exec: golang-executor
+  tag_deploy:
+    jobs:
+    - ta-docker/docker_git_tag:
+        context: docker-registry-access
+        name: go-sx
+        image-name: go-sx
+        filters:
+          tags:
+            only: /.*/
+          branches:
+            ignore: /.*/
