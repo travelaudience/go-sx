@@ -1,6 +1,6 @@
 module github.com/travelaudience/go-sx
 
-go 1.13
+go 1.19
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.3.3

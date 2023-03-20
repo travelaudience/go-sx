@@ -23,14 +23,13 @@ func TestMatching(t *testing.T) {
 	}
 
 	type test3 struct {
-		a int
 	}
 
 	type test4 struct {
 		A int `sx:"-"`
 		B int `sx:"foo"`
 		C int `sx:"bar"`
-		d int `sx:"baz"`
+		_ int `sx:"baz"`
 	}
 
 	t.Run("panics on bad input", func(t *testing.T) {
@@ -40,7 +39,6 @@ func TestMatching(t *testing.T) {
 			data      interface{}
 			wantPanic string
 		}{
-
 			{
 				name:      "pass a struct, not a pointer",
 				data:      test1{},

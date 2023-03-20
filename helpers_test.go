@@ -194,8 +194,8 @@ func TestLimitOffset(t *testing.T) {
 func TestInsertPanic(t *testing.T) {
 	// InsertQuery should panic if all of a struct's fields are tagged readonly.
 	type ohNo struct {
-		field1 int `sx:",readonly"`
-		field2 int `sx:",readonly"`
+		_ int `sx:",readonly"`
+		_ int `sx:",readonly"`
 	}
 	const wantPanic = "sx: struct ohNo has no usable fields"
 
@@ -409,7 +409,7 @@ func TestUpdateFields(t *testing.T) {
 		},
 	}
 
-	type menagerie1 struct {
+	type _ struct {
 		Chimpanzee int64  `sx:"human"`
 		Flamingo   string `sx:",readonly"`
 		Warthog    string `sx:"-"`
