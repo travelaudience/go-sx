@@ -1,20 +1,34 @@
-# Golang CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-go/ for more details
-# https://github.com/CircleCI-Public/circleci-demo-go/blob/master/.circleci/config.yml
-version: 2
-jobs:
-  build:
-    docker:
-      # specify the version
-      - image: cimg/go:1.17
+version: 2.1
 
-    steps:
-      - checkout
-      - run: go test -race -count=1 -coverprofile=profile.out ./...
+orbs:
+  ta-go: travelaudience/go@0.8.0
+  ta-deploy: travelaudience/deploy@0.3
+
+executors:
+  golang-executor:
+    docker:
+    - image: golang:1.19.0-bullseye
+    environment:
+      GO111MODULE: "on"
+      GOPRIVATE: github.com/travelaudience/*
+    working_directory: /go/src/github.com/travelaudience/go-sx/
 
 workflows:
-  version: 2
-  build-workflow:
+  build_and_test:
     jobs:
-      - build
+
+    - ta-go/checks:
+        name: check
+        exec: golang-executor
+        run-static-analysis: true
+
+    - ta-go/test_and_coverage:
+        name: test
+        exec: golang-executor
+
+    - ta-go/build:
+        name: build
+        requires:
+        - check
+        - test
+        exec: golang-executor
