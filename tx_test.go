@@ -4,36 +4,17 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"flag"
-	"fmt"
 	"math/rand"
 	"os"
 	"strings"
 	"testing"
-	"time"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 
 	sx "github.com/travelaudience/go-sx"
 )
 
-var randseed int64
-
-func init() {
-	// The tests here use pseudo-random numbers for parameters whose values shouldn't matter.  The random number
-	// generator is seeded with the lower 16 bits of unix nanotime by default.  If for some odd reason there is a
-	// particular pseudo-random sequence that fails, we can reproduce the sequence by explicitly setting the seed.
-	flag.Int64Var(&randseed, "seed", 0, "seed the random number generator")
-}
-
 func TestMain(m *testing.M) {
-	flag.Parse()
-	if randseed == 0 {
-		randseed = time.Now().UnixNano() % 65536
-	}
-	rand.Seed(randseed)
-	// Display the seed so that we can reproduce the test run if needed.
-	fmt.Printf("Using seed %d.\n", randseed)
 	os.Exit(m.Run())
 }
 
