@@ -1,0 +1,26 @@
+name: Go Checks Tests
+
+on:
+  push:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  go_checks:
+    name: Run Go Checks
+    uses: travelaudience/ci/.github/workflows/go_checks_r.yml@main
+    with:
+      go_version: "1.23"
+      run_static_analysis: true
+      private_module_credentials_enabled: false
+
+  go_test_and_coverage:
+    name: Run Go Tests and Coverage
+    uses: travelaudience/ci/.github/workflows/go_test_and_coverage_r.yml@main
+    with:
+      go_version: "1.23"
+      private_module_credentials_enabled: false
