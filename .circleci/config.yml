@@ -10,6 +10,9 @@ executors:
 
 workflows:
   build_and_test:
+    # CircleCI is intentionally disabled after migrating this repository to
+    # GitHub Actions. The active workflows are under .github/workflows/.
+    when: false
     jobs:
 
     - ta-go/checks:
